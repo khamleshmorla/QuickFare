@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Fare Results - QuickFare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/jsLKmRQo5dY5dX9uA=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPrJsx1qkMrAvYwkMMT6Gs6YMWarej_gs&libraries=places,directions"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Mobile-first styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+                min-height: 100vh;
+                height: 100vh;
+                overflow: hidden;
+            }
+            .glass-card {
+                padding: 0.75rem;
+                margin: 0;
+                border-radius: 0;
+                height: 100vh;
+                overflow-y: auto;
+            }
+            .fare-option {
+                flex-direction: column;
+                padding: 0.75rem;
+                margin-bottom: 0.5rem;
+            }
+            .fare-option > div {
+                width: 100%;
+                text-align: center;
+                margin-top: 0.5rem;
+            }
+            #map {
+                height: 30vh;
+                margin: 0.5rem 0;
+            }
+            .highlight-box {
+                padding: 0.75rem;
+                margin: 0.5rem 0;
+            }
+            .text-4xl {
+                font-size: 1.5rem;
+            }
+            .text-2xl {
+                font-size: 1.25rem;
+            }
+            .text-xl {
+                font-size: 1.1rem;
+            }
+            .text-lg {
+                font-size: 1rem;
+            }
+            .text-sm {
+                font-size: 0.875rem;
+            }
+            .location-results {
+                position: absolute;
+                background-color: white;
+                color: black;
+                width: 100%;
+                z-index: 50;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                max-height: 12rem;
+                overflow-y: auto;
+                text-align: left;
+            }
+            .p-4 {
+                padding: 0.75rem;
+            }
+            .py-2 {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+            .px-4 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            .space-y-4 > * + * {
+                margin-top: 0.5rem;
+            }
+            .mb-8 {
+                margin-bottom: 1rem;
+            }
+            .mt-8 {
+                margin-top: 1rem;
+            }
+        }
+
+        /* Common styles */
+        body {
+            background: linear-gradient(135deg, #1a365d, #2d3748);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.5s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        .fare-option {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .fare-option:hover {
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .dark-mode {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e5e7eb;
+        }
+        .highlight-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .highlight-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: #f59e0b;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .nav-link:hover {
+            color: #f59e0b;
+        }
+        .service-logo {
+            transition: all 0.3s ease;
+        }
+        .service-logo:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+        .section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .save-location-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .save-location-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .save-location-btn.saved {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+        .save-location-btn.saved i {
+            color: #10b981;
+        }
+        .save-location-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+        .save-location-modal.active {
+            display: flex;
+        }
+        .save-location-form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .fare-card {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .map-container {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .loading-spinner {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <nav class="bg-white/95 shadow-md p-4 flex justify-between items-center sticky top-0 z-50 w-full backdrop-blur-lg">
+        <h1 class="text-2xl font-bold text-black flex items-center">
+            <span class="text-yellow-500 mr-2">⚡</span>QuickFare
+        </h1>
+        <div class="flex space-x-8 text-black">
+            <a href="./index.html#home" class="nav-link hover:text-yellow-500 font-medium">Home</a>
+            <a href="./index.html#about" class="nav-link hover:text-yellow-500 font-medium">About</a>
+            <a href="./index.html#contact" class="nav-link hover:text-yellow-500 font-medium">Contact</a>
+            <a href="./index.html#faq" class="nav-link hover:text-yellow-500 font-medium">FAQ</a>
+        </div>
+        <div class="flex items-center space-x-6">
+            <button id="darkModeToggle" class="text-black hover:text-yellow-500 transition-colors duration-300">🌙</button>
+            <div class="flex space-x-4">
+                <img src="https://bl-i.thgim.com/public/incoming/ln7mm7/article67393201.ece/alternates/LANDSCAPE_1200/ola%20logo.jpg" alt="Ola" class="h-8 service-logo">
+                <img src="https://tuskstrategies.com/wp-content/uploads/2022/07/uber-logo_4.png" alt="Uber" class="h-8 service-logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMzAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMzAiPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMzAiIHJ4PSI0IiBmaWxsPSIjZmNlODNhIi8+PHRleHQgeD0iNTAiIHk9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiPlJhcGlkbzwvdGV4dD48L3N2Zz4=" alt="Rapido" class="h-8 service-logo">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Save Location Button -->
+    <button id="saveLocationBtn" class="save-location-btn" title="Save Location">
+        <i class="fas fa-bookmark text-white text-xl"></i>
+    </button>
+
+    <!-- Save Location Modal -->
+    <div id="saveLocationModal" class="save-location-modal">
+        <div class="save-location-form">
+            <h3 class="text-2xl font-bold mb-4">Save Location</h3>
+            <form id="saveLocationForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-200 mb-2">Location Name</label>
+                    <input type="text" id="locationName" placeholder="e.g., Home, Office" required
+                        class="w-full p-3 rounded-lg input-field">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-200 mb-2">Pickup Location</label>
+                    <input type="text" id="savedPickup" readonly
+                        class="w-full p-3 rounded-lg input-field bg-gray-800">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-200 mb-2">Drop Location</label>
+                    <input type="text" id="savedDrop" readonly
+                        class="w-full p-3 rounded-lg input-field bg-gray-800">
+                </div>
+                <div class="flex space-x-4">
+                    <button type="button" onclick="closeSaveLocationModal()"
+                        class="flex-1 bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700 transition">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-yellow-400 text-gray-900 py-2 rounded-lg hover:bg-yellow-500 transition">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <section class="flex-grow flex items-center justify-center px-6 py-12 section">
+        <div class="text-center max-w-4xl w-full">
+            <h2 class="text-4xl font-extrabold text-white mb-6 animate__animated animate__fadeIn">🚖 Your Fare Comparison</h2>
+            <div class="glass-card">
+                <!-- Map -->
+                <div id="map" class="mb-8"></div>
+                
+                <!-- Location Details (Editable Flow) -->
+                <div class="highlight-box mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                        <div class="text-left relative">
+                            <label for="pickupInput" class="block text-sm font-semibold text-yellow-400 mb-2">📍 Pickup Location</label>
+                            <div class="relative group">
+                                <input type="text" id="pickupInput" placeholder="Enter Pickup Location"
+                                    class="w-full p-4 pr-12 rounded-xl input-field bg-gray-800/80 backdrop-blur text-white border border-gray-600 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 focus:outline-none shadow-inner transition-all duration-300">
+                                <button type="button" onclick="fetchCurrentLocation()" title="Use Current Location"
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-yellow-400 transition-colors">
+                                    <i class="fas fa-location-crosshairs text-lg"></i>
+                                </button>
+                            </div>
+                            <div id="pickup-results" class="location-results hidden absolute z-50 w-full mt-1 bg-white text-black rounded-lg shadow-xl max-h-48 overflow-y-auto"></div>
+                        </div>
+                        
+                        <!-- Swap Button -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none md:flex hidden">
+                            <button type="button" onclick="swapAndRefetch()" title="Swap Locations"
+                                class="h-10 w-10 flex items-center justify-center bg-gray-800 border-2 border-gray-600 hover:border-yellow-400 hover:bg-gray-700 rounded-full transition-all hover:rotate-180 duration-300 pointer-events-auto z-10 shadow-xl">
+                                <i class="fas fa-exchange-alt text-yellow-400 text-sm"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Mobile Swap Button -->
+                        <div class="flex justify-center -my-3 relative z-10 md:hidden">
+                            <button type="button" onclick="swapAndRefetch()" title="Swap Locations"
+                                class="h-10 w-10 flex items-center justify-center bg-gray-800 border-2 border-gray-600 hover:border-yellow-400 hover:bg-gray-700 rounded-full transition-all hover:rotate-180 duration-300 shadow-xl">
+                                <i class="fas fa-exchange-alt text-yellow-400 rotate-90 text-sm"></i>
+                            </button>
+                        </div>
+
+                        <div class="text-left relative">
+                            <label for="dropInput" class="block text-sm font-semibold text-yellow-400 mb-2">📍 Drop Location</label>
+                            <input type="text" id="dropInput" placeholder="Enter Drop Location"
+                                class="w-full p-4 rounded-xl input-field bg-gray-800/80 backdrop-blur text-white border border-gray-600 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 focus:outline-none shadow-inner transition-all duration-300">
+                            <div id="drop-results" class="location-results hidden absolute z-50 w-full mt-1 bg-white text-black rounded-lg shadow-xl max-h-48 overflow-y-auto"></div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="applyNewLocations()" id="updateRouteBtn" 
+                        class="mt-6 w-full bg-gradient-to-r from-gray-700 to-gray-800 text-white py-4 rounded-xl hover:from-yellow-400 hover:to-yellow-500 hover:text-gray-900 transition-all font-bold transform hover:-translate-y-1 shadow-lg hover:shadow-yellow-500/30 duration-200 hidden relative group overflow-hidden">
+                        <span class="relative z-10">Apply New Route <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></span>
+                        <div class="absolute inset-0 h-full w-full bg-white/20 scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-300 ease-out z-0"></div>
+                    </button>
+                </div>
+
+                <!-- Distance and Time -->
+                <div class="highlight-box mb-8 grid grid-cols-2 gap-6 text-center">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-300">📏 Distance</p>
+                        <p id="distance" class="text-3xl font-bold text-white mt-2">Fetching...</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-300">⏳ Time</p>
+                        <p id="time" class="text-3xl font-bold text-white mt-2">Fetching...</p>
+                    </div>
+                </div>
+
+                <!-- Ride Type Filter -->
+                <div class="mb-6 flex justify-center space-x-2 bg-gray-800 p-2 rounded-lg max-w-sm mx-auto shadow-inner">
+                    <button onclick="updateRideType('bike')" id="btn-bike" class="flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🏍️ Bike</button>
+                    <button onclick="updateRideType('auto')" id="btn-auto" class="flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🛺 Auto</button>
+                    <button onclick="updateRideType('car')" id="btn-car"  class="flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🚗 Car</button>
+                </div>
+
+                <!-- Fare Options -->
+                <div id="fares" class="space-y-4"></div>
+
+                <p class="text-xs text-gray-300 mt-6">*Fares may vary due to surge pricing or traffic conditions.</p>
+
+                <button onclick="window.location.href = './index.html#home'" 
+                    class="mt-8 bg-gray-800 border border-gray-700 text-white font-bold px-8 py-4 rounded-xl hover:bg-gray-700 hover:border-gray-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg flex items-center justify-center mx-auto group">
+                    <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i> Back to Search
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-white/95 text-center p-6 shadow-md w-full mt-auto backdrop-blur-lg">
+        <p class="text-gray-700">© 2025 QuickFare. All rights reserved.</p>
+        <div class="mt-4 flex justify-center space-x-6">
+            <a href="#" class="text-gray-600 hover:text-yellow-500 transition-colors duration-300">Twitter</a>
+            <a href="#" class="text-gray-600 hover:text-yellow-500 transition-colors duration-300">LinkedIn</a>
+            <a href="#" class="text-gray-600 hover:text-yellow-500 transition-colors duration-300">GitHub</a>
+        </div>
+    </footer>
+
+    <script>
+        const GOMAPS_API_KEY = "AlzaSyZ5OC1nbpF369im1q9BueogaIIR5T50g8x";
+
+        // Dark Mode Toggle
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        });
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+
+        const fares = {
+            bike: [
+                { service: "🏍️ Rapido Bike", price: "₹50", eta: "10 min", deeplink: "rapido://ride?pickup={pickup}&drop={drop}" },
+                { service: "🚴 Ola Bike", price: "₹55", eta: "12 min", deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=bike" },
+                { service: "🏍️ Uber Moto", price: "₹52", eta: "11 min", deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=moto" }
+            ],
+            auto: [
+                { service: "🛺 Ola Auto", price: "₹70", eta: "15 min", deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=auto" },
+                { service: "🚜 Uber Auto", price: "₹75", eta: "14 min", deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=auto" }
+            ],
+            car: [
+                { service: "🚗 Ola Mini", price: "₹120", eta: "18 min", deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=mini" },
+                { service: "🚖 UberGo", price: "₹125", eta: "17 min", deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=ubergo" },
+                { service: "🚙 Ola Sedan", price: "₹140", eta: "20 min", deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=sedan" }
+            ]
+        };
+
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                pickup: params.get("pickup"),
+                drop: params.get("drop"),
+                rideType: params.get("rideType")
+            };
+        }
+
+        async function fetchDistanceAndTime(pickup, drop) {
+            const service = new google.maps.DistanceMatrixService();
+            try {
+                const response = await service.getDistanceMatrix({
+                    origins: [pickup],
+                    destinations: [drop],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC
+                });
+
+                if (response.rows[0].elements[0].status === "OK") {
+                    const distance = response.rows[0].elements[0].distance;
+                    const duration = response.rows[0].elements[0].duration;
+                    document.getElementById("distance").innerText = distance.text;
+                    document.getElementById("time").innerText = duration.text;
+                    return { distance, duration };
+                } else {
+                    document.getElementById("distance").innerText = "N/A";
+                    document.getElementById("time").innerText = "N/A";
+                    return null;
+                }
+            } catch (error) {
+                console.error("Error fetching distance:", error);
+                document.getElementById("distance").innerText = "Error";
+                document.getElementById("time").innerText = "Error";
+                return null;
+            }
+        }
+
+        async function geocodeLocation(address) {
+            const geocoder = new google.maps.Geocoder();
+            try {
+                const response = await geocoder.geocode({ address });
+                if (response.results.length > 0) {
+                    const location = response.results[0].geometry.location;
+                    return {
+                        lat: location.lat(),
+                        lng: location.lng()
+                    };
+                }
+                return null;
+            } catch (error) {
+                console.error("Geocoding error:", error);
+                return null;
+            }
+        }
+
+        // Fare calculation algorithms
+        const fareAlgorithms = {
+            // Ola fare calculation
+            ola: {
+                bike: (distance) => {
+                    const baseFare = 25;
+                    const perKm = 3.5;
+                    const minFare = distance <= 2 ? 28 : (distance <= 5 ? 33 : 38);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                auto: (distance) => {
+                    const baseFare = 30;
+                    const perKm = 4.5;
+                    const minFare = distance <= 2 ? 33 : (distance <= 5 ? 39 : 45);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                mini: (distance) => {
+                    const baseFare = 35;
+                    const perKm = 6.5;
+                    const minFare = distance <= 2 ? 39 : (distance <= 5 ? 46 : 53);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                sedan: (distance) => {
+                    const baseFare = 40;
+                    const perKm = 7;
+                    const minFare = distance <= 2 ? 44 : (distance <= 5 ? 52 : 60);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                prime: (distance) => {
+                    const baseFare = 45;
+                    const perKm = 8.5;
+                    const minFare = distance <= 2 ? 50 : (distance <= 5 ? 59 : 68);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                luxury: (distance) => {
+                    const baseFare = 60;
+                    const perKm = 10;
+                    const minFare = distance <= 2 ? 66 : (distance <= 5 ? 78 : 90);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                }
+            },
+            // Uber fare calculation
+            uber: {
+                bike: (distance) => {
+                    const baseFare = 28;
+                    const perKm = 3.8;
+                    const minFare = distance <= 2 ? 31 : (distance <= 5 ? 36 : 42);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                auto: (distance) => {
+                    const baseFare = 32;
+                    const perKm = 4.8;
+                    const minFare = distance <= 2 ? 35 : (distance <= 5 ? 42 : 48);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                go: (distance) => {
+                    const baseFare = 38;
+                    const perKm = 7.2;
+                    const minFare = distance <= 2 ? 42 : (distance <= 5 ? 49 : 57);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                premier: (distance) => {
+                    const baseFare = 42;
+                    const perKm = 8.2;
+                    const minFare = distance <= 2 ? 46 : (distance <= 5 ? 55 : 63);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                xl: (distance) => {
+                    const baseFare = 48;
+                    const perKm = 9.5;
+                    const minFare = distance <= 2 ? 53 : (distance <= 5 ? 62 : 72);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                black: (distance) => {
+                    const baseFare = 65;
+                    const perKm = 11.5;
+                    const minFare = distance <= 2 ? 72 : (distance <= 5 ? 85 : 98);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                }
+            },
+            // Rapido fare calculation
+            rapido: {
+                bike: (distance) => {
+                    const baseFare = 22;
+                    const perKm = 3.2;
+                    const minFare = distance <= 2 ? 24 : (distance <= 5 ? 29 : 33);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                auto: (distance) => {
+                    const baseFare = 28;
+                    const perKm = 4.2;
+                    const minFare = distance <= 2 ? 31 : (distance <= 5 ? 36 : 42);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                },
+                car: (distance) => {
+                    const baseFare = 35;
+                    const perKm = 6.8;
+                    const minFare = distance <= 2 ? 39 : (distance <= 5 ? 46 : 53);
+                    const fare = baseFare + (distance * perKm);
+                    return Math.max(fare, minFare);
+                }
+            }
+        };
+
+        // Calculate fares based on distance
+        function calculateFares(distance) {
+            const fares = {
+                bike: [
+                    { 
+                        service: "🏍️ Rapido Bike", 
+                        price: `₹${Math.round(fareAlgorithms.rapido.bike(distance))}`,
+                        eta: "10 min",
+                        deeplink: "rapido://ride?pickup={pickup}&drop={drop}",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.rapido.passenger"
+                    },
+                    { 
+                        service: "🚴 Ola Bike", 
+                        price: `₹${Math.round(fareAlgorithms.ola.bike(distance))}`,
+                        eta: "12 min",
+                        deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=bike",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.olacabs.customer"
+                    },
+                    { 
+                        service: "🏍️ Uber Moto", 
+                        price: `₹${Math.round(fareAlgorithms.uber.bike(distance))}`,
+                        eta: "11 min",
+                        deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=moto",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.ubercab"
+                    }
+                ],
+                auto: [
+                    { 
+                        service: "🛺 Rapido Auto", 
+                        price: `₹${Math.round(fareAlgorithms.rapido.auto(distance))}`,
+                        eta: "15 min",
+                        deeplink: "rapido://ride?pickup={pickup}&drop={drop}&type=auto",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.rapido.passenger"
+                    },
+                    { 
+                        service: "🛺 Ola Auto", 
+                        price: `₹${Math.round(fareAlgorithms.ola.auto(distance))}`,
+                        eta: "15 min",
+                        deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=auto",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.olacabs.customer"
+                    },
+                    { 
+                        service: "🚜 Uber Auto", 
+                        price: `₹${Math.round(fareAlgorithms.uber.auto(distance))}`,
+                        eta: "14 min",
+                        deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=auto",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.ubercab"
+                    }
+                ],
+                car: [
+                    { 
+                        service: "🚗 Ola Mini", 
+                        price: `₹${Math.round(fareAlgorithms.ola.mini(distance))}`,
+                        eta: "18 min",
+                        deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=mini",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.olacabs.customer"
+                    },
+                    { 
+                        service: "🚗 Ola Sedan", 
+                        price: `₹${Math.round(fareAlgorithms.ola.sedan(distance))}`,
+                        eta: "20 min",
+                        deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=sedan",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.olacabs.customer"
+                    },
+                    { 
+                        service: "🚗 Ola Prime", 
+                        price: `₹${Math.round(fareAlgorithms.ola.prime(distance))}`,
+                        eta: "22 min",
+                        deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=prime",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.olacabs.customer"
+                    },
+                    { 
+                        service: "🚗 Ola Luxury", 
+                        price: `₹${Math.round(fareAlgorithms.ola.luxury(distance))}`,
+                        eta: "25 min",
+                        deeplink: "ola://ride?pickup={pickup}&destination={drop}&category=luxury",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.olacabs.customer"
+                    },
+                    { 
+                        service: "🚖 UberGo", 
+                        price: `₹${Math.round(fareAlgorithms.uber.go(distance))}`,
+                        eta: "17 min",
+                        deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=ubergo",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.ubercab"
+                    },
+                    { 
+                        service: "🚖 Uber Premier", 
+                        price: `₹${Math.round(fareAlgorithms.uber.premier(distance))}`,
+                        eta: "19 min",
+                        deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=premier",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.ubercab"
+                    },
+                    { 
+                        service: "🚖 Uber XL", 
+                        price: `₹${Math.round(fareAlgorithms.uber.xl(distance))}`,
+                        eta: "21 min",
+                        deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=xl",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.ubercab"
+                    },
+                    { 
+                        service: "🚖 Uber Black", 
+                        price: `₹${Math.round(fareAlgorithms.uber.black(distance))}`,
+                        eta: "24 min",
+                        deeplink: "uber://?action=setPickup&pickup[latitude]={pickupLat}&pickup[longitude]={pickupLng}&dropoff[latitude]={dropLat}&dropoff[longitude]={dropLng}&product_id=black",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.ubercab"
+                    },
+                    { 
+                        service: "🚗 Rapido Car", 
+                        price: `₹${Math.round(fareAlgorithms.rapido.car(distance))}`,
+                        eta: "20 min",
+                        deeplink: "rapido://ride?pickup={pickup}&drop={drop}&type=car",
+                        fallbackUrl: "https://play.google.com/store/apps/details?id=com.rapido.passenger"
+                    }
+                ]
+            };
+            return fares;
+        }
+
+        async function displayFares() {
+            const { pickup, drop, rideType } = getQueryParams();
+            
+            // Set input values to the passed parameters
+            const pickupInput = document.getElementById("pickupInput");
+            const dropInput = document.getElementById("dropInput");
+            if (pickupInput) pickupInput.value = pickup || '';
+            if (dropInput) dropInput.value = drop || '';
+
+            const pickupCoords = await geocodeLocation(pickup);
+            const dropCoords = await geocodeLocation(drop);
+
+            // Initialize Map
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+                center: { lat: 20.5937, lng: 78.9629 },
+                styles: [
+                    {
+                        "featureType": "all",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#242f3e"}]
+                    },
+                    {
+                        "featureType": "all",
+                        "elementType": "labels.text.stroke",
+                        "stylers": [{"color": "#242f3e"}]
+                    }
+                ]
+            });
+
+            if (pickupCoords && dropCoords) {
+                // Add markers
+                new google.maps.Marker({
+                    position: pickupCoords,
+                    map: map,
+                    title: "Pickup"
+                });
+
+                new google.maps.Marker({
+                    position: dropCoords,
+                    map: map,
+                    title: "Drop"
+                });
+
+                // Draw route
+                const directionsService = new google.maps.DirectionsService();
+                const directionsRenderer = new google.maps.DirectionsRenderer({
+                    map: map,
+                    suppressMarkers: true,
+                    polylineOptions: {
+                        strokeColor: '#f59e0b',
+                        strokeWeight: 5
+                    }
+                });
+
+                directionsService.route({
+                    origin: pickupCoords,
+                    destination: dropCoords,
+                    travelMode: google.maps.TravelMode.DRIVING
+                }, (result, status) => {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(result);
+                    }
+                });
+
+                // Fit bounds
+                const bounds = new google.maps.LatLngBounds();
+                bounds.extend(pickupCoords);
+                bounds.extend(dropCoords);
+                map.fitBounds(bounds, { padding: 50 });
+            }
+
+            window.fetchAndDisplayFares = async function(routePickup, routeDrop, rType) {
+                try {
+                    // Fetch fares from Spring Boot backend
+                    const response = await fetch(`/api/route?pickup=${routePickup}&drop=${routeDrop}&rideType=${rType}`);
+                    const data = await response.json();
+
+                    if (data.success && data.prices) {
+                        document.getElementById("distance").innerText = data.distance;
+                        document.getElementById("time").innerText = data.time;
+                        
+                        const faresDiv = document.getElementById("fares");
+                        faresDiv.innerHTML = data.prices.map(fare => {
+                            let link = "";
+                            let fallbackUrl = "";
+                            
+                            if (fare.service === "Ola") {
+                                link = `ola://ride?pickup=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(drop)}&category=${fare.vehicle_type}`;
+                                fallbackUrl = "https://play.google.com/store/apps/details?id=com.olacabs.customer";
+                            } else if (fare.service === "Uber") {
+                                link = `uber://?action=setPickup&pickup[latitude]=${pickupCoords?.lat || ''}&pickup[longitude]=${pickupCoords?.lng || ''}&dropoff[latitude]=${dropCoords?.lat || ''}&dropoff[longitude]=${dropCoords?.lng || ''}&product_id=${fare.vehicle_type}`;
+                                fallbackUrl = "https://play.google.com/store/apps/details?id=com.ubercab";
+                            } else if (fare.service === "Rapido") {
+                                link = `rapido://ride?pickup=${encodeURIComponent(pickup)}&drop=${encodeURIComponent(drop)}`;
+                                fallbackUrl = "https://play.google.com/store/apps/details?id=com.rapido.passenger";
+                            }
+
+                            return `
+                            <div class="fare-option p-4 rounded-lg flex justify-between items-center">
+                                <span class="text-lg font-medium">${fare.display_name}</span>
+                                <div class="text-right flex items-center space-x-4">
+                                    <div>
+                                        <strong class="text-xl text-yellow-400">₹${fare.fare}</strong>
+                                        <p class="text-sm text-gray-300">${fare.eta}</p>
+                                    </div>
+                                    <button onclick="openRideLink('${link}', '${fallbackUrl}')" 
+                                        class="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-500 transition font-bold transform hover:scale-105 duration-200">
+                                        Book Now
+                                    </button>
+                                </div>
+                            </div>
+                            `;
+                        }).join("");
+                    } else {
+                        document.getElementById("fares").innerHTML = '<p class="text-red-400 p-4">Could not load fares.</p>';
+                        document.getElementById("distance").innerText = "Error";
+                        document.getElementById("time").innerText = "Error";
+                    }
+                } catch (error) {
+                    console.error("Error fetching from backend API:", error);
+                    document.getElementById("fares").innerHTML = '<p class="text-red-400 p-4">Error loading fares. Ensure backend is running.</p>';
+                    document.getElementById("distance").innerText = "Error";
+                    document.getElementById("time").innerText = "Error";
+                }
+            };
+
+            // Set initial active button
+            const initialBtn = document.getElementById(`btn-${rideType.toLowerCase()}`);
+            if (initialBtn) {
+                initialBtn.className = "flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 bg-yellow-400 text-gray-900";
+            }
+
+            // Define the global update function
+            window.updateRideType = async function(newRideType) {
+                // Update UI Buttons
+                ['bike', 'auto', 'car'].forEach(t => {
+                    const btn = document.getElementById(`btn-${t}`);
+                    if (btn) {
+                        if (t === newRideType) {
+                            btn.className = "flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 bg-yellow-400 text-gray-900";
+                        } else {
+                            btn.className = "flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700";
+                        }
+                    }
+                });
+
+                // Update URL silently
+                const url = new URL(window.location);
+                url.searchParams.set('rideType', newRideType);
+                window.history.pushState({}, '', url);
+
+                // Show loading
+                document.getElementById("fares").innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-3xl text-yellow-400"></i><p class="mt-2 text-gray-300">Fetching fares...</p></div>';
+
+                // Refetch fares using the cached pickup/drop text
+                await fetchAndDisplayFares(encodeURIComponent(pickup), encodeURIComponent(drop), encodeURIComponent(newRideType));
+            };
+
+            // Initial fetch
+            await fetchAndDisplayFares(encodeURIComponent(pickup), encodeURIComponent(drop), encodeURIComponent(rideType));
+        }
+
+        function openRideLink(link, fallbackUrl) {
+            // Try to open the app directly
+            window.location.href = link;
+            
+            // Set timeout to check if app opened
+            setTimeout(() => {
+                // If we're still on the page after 2 seconds, the app didn't open
+                if (document.hidden === false) {
+                    window.location.href = fallbackUrl;
+                }
+            }, 2000);
+        }
+
+        // Intersection Observer for Section Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Save Location Functionality
+        const saveLocationBtn = document.getElementById('saveLocationBtn');
+        const saveLocationModal = document.getElementById('saveLocationModal');
+        const saveLocationForm = document.getElementById('saveLocationForm');
+        const savedPickup = document.getElementById('savedPickup');
+        const savedDrop = document.getElementById('savedDrop');
+        const locationName = document.getElementById('locationName');
+
+        // Check if location is already saved (using localStorage)
+        function checkIfLocationSaved() {
+            const { pickup, drop } = getQueryParams();
+            const savedLocations = JSON.parse(localStorage.getItem('savedLocations') || '[]');
+
+            const isSaved = savedLocations.some(loc => 
+                loc.pickup === pickup && loc.drop === drop
+            );
+
+            if (isSaved) {
+                saveLocationBtn.classList.add('saved');
+                saveLocationBtn.title = 'Location Saved';
+            }
+        }
+
+        // Open save location modal
+        saveLocationBtn.addEventListener('click', () => {
+            const { pickup, drop } = getQueryParams();
+            savedPickup.value = pickup;
+            savedDrop.value = drop;
+            locationName.value = '';
+            saveLocationModal.classList.add('active');
+        });
+
+        // Close save location modal
+        function closeSaveLocationModal() {
+            saveLocationModal.classList.remove('active');
+        }
+
+        // Save location (using localStorage)
+        saveLocationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const { pickup, drop } = getQueryParams();
+            const name = locationName.value.trim();
+
+            if (!name) {
+                alert('Please enter a location name');
+                return;
+            }
+
+            try {
+                const savedLocations = JSON.parse(localStorage.getItem('savedLocations') || '[]');
+                const locationData = {
+                    id: Date.now().toString(),
+                    name,
+                    pickup,
+                    drop,
+                    createdAt: new Date().toISOString()
+                };
+
+                // Avoid duplicates
+                const exists = savedLocations.some(loc => loc.pickup === pickup && loc.drop === drop);
+                if (!exists) {
+                    savedLocations.push(locationData);
+                    localStorage.setItem('savedLocations', JSON.stringify(savedLocations));
+                }
+
+                // Update UI
+                saveLocationBtn.classList.add('saved');
+                saveLocationBtn.title = 'Location Saved';
+                closeSaveLocationModal();
+                alert('Location saved successfully!');
+            } catch (error) {
+                console.error('Error saving location:', error);
+                alert('Failed to save location. Please try again.');
+            }
+        });
+
+        // Fetch Current Location 
+        function fetchCurrentLocation() {
+            const pickupInput = document.getElementById('pickupInput');
+            
+            if (!navigator.geolocation) {
+                showToast("Geolocation is not supported by your browser.", "error");
+                return;
+            }
+
+            const originalPlaceholder = pickupInput.placeholder;
+            pickupInput.value = '';
+            pickupInput.placeholder = "📍 Locating you...";
+            
+            const btnIcon = document.querySelector('button[title="Use Current Location"] i');
+            if (btnIcon) btnIcon.classList.add('fa-spin');
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    if (btnIcon) btnIcon.classList.remove('fa-spin');
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    try {
+                        const geocoder = new google.maps.Geocoder();
+                        const latlng = { lat: lat, lng: lng };
+                        
+                        geocoder.geocode({ location: latlng }, (results, status) => {
+                            if (status === "OK" && results[0]) {
+                                pickupInput.value = results[0].formatted_address;
+                                checkForLocationChanges();
+                            } else {
+                                pickupInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                                checkForLocationChanges();
+                            }
+                            pickupInput.placeholder = originalPlaceholder;
+                        });
+                    } catch (e) {
+                        pickupInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                        pickupInput.placeholder = originalPlaceholder;
+                        checkForLocationChanges();
+                    }
+                },
+                (error) => {
+                    if (btnIcon) btnIcon.classList.remove('fa-spin');
+                    pickupInput.placeholder = originalPlaceholder;
+                    let msg = "Error locating.";
+                    if (error.code === 1) msg = "Location access denied.";
+                    else if (error.code === 2) msg = "Position unavailable. No internet?";
+                    else if (error.code === 3) msg = "Location finding timed out.";
+                    showToast(msg, "error");
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        // Swap functionality
+        function swapAndRefetch() {
+            const pickupInput = document.getElementById('pickupInput');
+            const dropInput = document.getElementById('dropInput');
+            
+            const temp = pickupInput.value;
+            pickupInput.value = dropInput.value;
+            dropInput.value = temp;
+
+            pickupInput.style.transform = 'translateY(5px)';
+            dropInput.style.transform = 'translateY(-5px)';
+            setTimeout(() => {
+                pickupInput.style.transform = '';
+                dropInput.style.transform = '';
+            }, 100);
+
+            checkForLocationChanges();
+        }
+
+        // Autocomplete Setup
+        function setupAutocomplete(inputId, resultsId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            const autocomplete = new google.maps.places.Autocomplete(input, {
+                types: ['geocode', 'establishment'],
+                componentRestrictions: { country: 'in' },
+                fields: ['formatted_address', 'geometry', 'name']
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    input.value = place.formatted_address;
+                    checkForLocationChanges();
+                }
+            });
+
+            input.addEventListener('input', checkForLocationChanges);
+        }
+
+        function checkForLocationChanges() {
+            const { pickup: originalPickup, drop: originalDrop } = getQueryParams();
+            const currentPickup = document.getElementById('pickupInput').value;
+            const currentDrop = document.getElementById('dropInput').value;
+            
+            const btn = document.getElementById('updateRouteBtn');
+            if (currentPickup !== originalPickup || currentDrop !== originalDrop) {
+                btn.classList.remove('hidden');
+                btn.classList.add('animate__animated', 'animate__fadeInUp');
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        function applyNewLocations() {
+            const pickup = document.getElementById('pickupInput').value;
+            const drop = document.getElementById('dropInput').value;
+            const { rideType } = getQueryParams();
+
+            if (!pickup || !drop) {
+                showToast("Please provide both pickup and drop locations.", "error");
+                return;
+            }
+
+            const url = new URL(window.location);
+            url.searchParams.set('pickup', pickup);
+            url.searchParams.set('drop', drop);
+            window.history.pushState({}, '', url);
+
+            // Reload page to reinitialize map and fares with new coordinates
+            window.location.reload();
+        }
+
+        // Initialize
+        window.onload = async function() {
+            await displayFares();
+            checkIfLocationSaved();
+            setupAutocomplete('pickupInput', 'pickup-results');
+            setupAutocomplete('dropInput', 'drop-results');
+        };
+
+        // Add viewport handling for mobile devices
+        function setViewport() {
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (window.innerWidth <= 768) {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+            } else {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+            }
+        }
+
+        // Initialize viewport on load and resize
+        window.addEventListener('load', setViewport);
+        window.addEventListener('resize', setViewport);
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fare cards animation
+            anime({
+                targets: '.fare-card',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 1000,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(100)
+            });
+
+            // Map container animation
+            anime({
+                targets: '.map-container',
+                opacity: [0, 1],
+                scale: [0.95, 1],
+                duration: 1000,
+                easing: 'easeOutExpo',
+                delay: 500
+            });
+
+            // Loading spinner animation
+            window.showLoading = function() {
+                const spinner = document.getElementById('loadingSpinner');
+                spinner.style.display = 'block';
+                anime({
+                    targets: spinner,
+                    opacity: [0, 1],
+                    scale: [0.8, 1],
+                    duration: 500,
+                    easing: 'easeOutExpo'
+                });
+            };
+
+            window.hideLoading = function() {
+                const spinner = document.getElementById('loadingSpinner');
+                anime({
+                    targets: spinner,
+                    opacity: [1, 0],
+                    scale: [1, 0.8],
+                    duration: 500,
+                    easing: 'easeInExpo',
+                    complete: () => {
+                        spinner.style.display = 'none';
+                    }
+                });
+            };
+
+            // Button hover animation
+            document.querySelectorAll('button').forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    anime({
+                        targets: button,
+                        scale: 1.05,
+                        duration: 300,
+                        easing: 'easeOutExpo'
+                    });
+                });
+
+                button.addEventListener('mouseleave', () => {
+                    anime({
+                        targets: button,
+                        scale: 1,
+                        duration: 300,
+                        easing: 'easeOutExpo'
+                    });
+                });
+            });
+
+            // Toast animation
+            window.showToast = function(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `toast ${type}`;
+                
+                anime({
+                    targets: toast,
+                    translateY: [100, 0],
+                    opacity: [0, 1],
+                    duration: 500,
+                    easing: 'easeOutExpo',
+                    complete: () => {
+                        setTimeout(() => {
+                            anime({
+                                targets: toast,
+                                translateY: [0, 100],
+                                opacity: [1, 0],
+                                duration: 500,
+                                easing: 'easeInExpo'
+                            });
+                        }, 3000);
+                    }
+                });
+            };
+        });
+    </script>
+</body>
+</html>

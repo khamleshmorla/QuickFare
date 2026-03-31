@@ -1,0 +1,34 @@
+# Build
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE
+*.iml
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.factorypath
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+log/
+*.jar
+*.war
+*.ear
+
+# Lombok
+lombok.config
+
+# Env
+.env
