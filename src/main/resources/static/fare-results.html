@@ -20,143 +20,148 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-    <style>
-        /* ========================================
-           Enterprise Responsive Design System
-           Mobile-first, scales to all screens
-        ======================================== */
+        /* Mobile-first styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+                min-height: 100vh;
+                height: 100vh;
+                overflow: hidden;
+            }
+            .glass-card {
+                padding: 0.75rem;
+                margin: 0;
+                border-radius: 0;
+                height: 100vh;
+                overflow-y: auto;
+            }
+            .fare-option {
+                flex-direction: column;
+                padding: 0.75rem;
+                margin-bottom: 0.5rem;
+            }
+            .fare-option > div {
+                width: 100%;
+                text-align: center;
+                margin-top: 0.5rem;
+            }
+            #map {
+                height: 30vh;
+                margin: 0.5rem 0;
+            }
+            .highlight-box {
+                padding: 0.75rem;
+                margin: 0.5rem 0;
+            }
+            .text-4xl {
+                font-size: 1.5rem;
+            }
+            .text-2xl {
+                font-size: 1.25rem;
+            }
+            .text-xl {
+                font-size: 1.1rem;
+            }
+            .text-lg {
+                font-size: 1rem;
+            }
+            .text-sm {
+                font-size: 0.875rem;
+            }
+            .location-results {
+                position: absolute;
+                background-color: white;
+                color: black;
+                width: 100%;
+                z-index: 50;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                max-height: 12rem;
+                overflow-y: auto;
+                text-align: left;
+            }
+            .p-4 {
+                padding: 0.75rem;
+            }
+            .py-2 {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+            .px-4 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            .space-y-4 > * + * {
+                margin-top: 0.5rem;
+            }
+            .mb-8 {
+                margin-bottom: 1rem;
+            }
+            .mt-8 {
+                margin-top: 1rem;
+            }
+        }
 
-        * { box-sizing: border-box; }
-
+        /* Common styles */
         body {
             background: linear-gradient(135deg, #1a365d, #2d3748);
             color: #fff;
             font-family: 'Poppins', sans-serif;
-            transition: background 0.5s ease;
-            min-height: 100vh;
+            transition: all 0.5s ease;
             margin: 0;
-            padding: 0;
+            overflow-x: hidden;
         }
-
-        /* --- Navigation --- */
-        nav {
-            padding: 0.75rem 1rem;
-        }
-        nav h1 { font-size: 1.2rem; }
-        .nav-links-desktop { display: none; }
-        .service-logo { height: 1.5rem; }
-
-        @media (min-width: 768px) {
-            nav { padding: 1rem 1.5rem; }
-            nav h1 { font-size: 1.5rem; }
-            .nav-links-desktop { display: flex; }
-            .service-logo { height: 2rem; }
-        }
-
-        /* --- Glass Card --- */
         .glass-card {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
-        }
-        @media (min-width: 768px) {
-            .glass-card { padding: 2rem; border-radius: 16px; }
-        }
-
-        /* --- Map --- */
-        #map {
-            height: 200px;
             width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 1rem;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        @media (min-width: 768px) {
-            #map { height: 300px; border-radius: 12px; }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
         }
-
-        /* --- Highlight Box --- */
-        .highlight-box {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            padding: 1rem;
-            transition: all 0.3s ease;
-            margin-bottom: 1rem;
-        }
-        @media (min-width: 768px) {
-            .highlight-box { padding: 1.5rem; border-radius: 12px; }
-        }
-
-        /* --- Fare Cards --- */
         .fare-option {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 0.875rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
         .fare-option:hover {
-            transform: scale(1.01);
-            background: rgba(255,255,255,0.14);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
-        .fare-option .fare-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-            flex: 1;
+        .dark-mode {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e5e7eb;
         }
-        .fare-option .fare-right {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-shrink: 0;
+        .highlight-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
         }
-        .fare-option .fare-price {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #fbbf24;
-            white-space: nowrap;
+        .highlight-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
-        .fare-option .fare-eta {
-            font-size: 0.7rem;
-            color: #9ca3af;
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .book-btn {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #111;
-            font-weight: 700;
-            font-size: 0.75rem;
-            padding: 0.45rem 0.85rem;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .book-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(251,191,36,0.4);
-        }
-
-        @media (min-width: 640px) {
-            .fare-option .fare-name { font-size: 1rem; }
-            .fare-option .fare-price { font-size: 1.25rem; }
-            .book-btn { font-size: 0.875rem; padding: 0.5rem 1.1rem; }
-        }
-
-        /* --- Nav Link underline --- */
         .nav-link {
             position: relative;
             transition: all 0.3s ease;
@@ -164,66 +169,45 @@
         .nav-link::after {
             content: '';
             position: absolute;
-            width: 0; height: 2px;
-            bottom: -4px; left: 0;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
             background: #f59e0b;
             transition: width 0.3s ease;
         }
-        .nav-link:hover::after { width: 100%; }
-        .nav-link:hover { color: #f59e0b; }
-        .service-logo-nav { transition: all 0.3s ease; }
-        .service-logo-nav:hover { transform: scale(1.1); filter: brightness(1.2); }
-
-        /* --- Section animation --- */
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .nav-link:hover {
+            color: #f59e0b;
+        }
+        .service-logo {
+            transition: all 0.3s ease;
+        }
+        .service-logo:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
         .section {
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.6s ease;
         }
-        .section.visible { opacity: 1; transform: translateY(0); }
-
-        /* --- Input fields --- */
-        .input-field {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            width: 100%;
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .input-field::placeholder { color: rgba(255,255,255,0.6); }
-        .input-field:focus {
-            background: rgba(255,255,255,0.15);
-            border-color: rgba(250,204,21,0.6);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(250,204,21,0.2);
-        }
-        
-        /* --- Location dropdown results --- */
-        .location-results {
-            position: absolute;
-            background: white;
-            color: black;
-            width: 100%;
-            z-index: 9999;
-            border-radius: 0.5rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            max-height: 12rem;
-            overflow-y: auto;
-            top: 100%;
-            left: 0;
-        }
-
-        /* --- Save location button --- */
         .save-location-btn {
             position: fixed;
-            top: 70px;
-            right: 12px;
-            background: rgba(255,255,255,0.1);
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 50%;
-            width: 44px; height: 44px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -231,76 +215,77 @@
             transition: all 0.3s ease;
             z-index: 1000;
         }
-        .save-location-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.2); }
-        .save-location-btn.saved { background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.4); }
-        .save-location-btn.saved i { color: #10b981; }
-
-        /* --- Modal --- */
+        .save-location-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .save-location-btn.saved {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+        .save-location-btn.saved i {
+            color: #10b981;
+        }
         .save-location-modal {
-            display: none; position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
             z-index: 1001;
             align-items: center;
             justify-content: center;
         }
-        .save-location-modal.active { display: flex; }
+        .save-location-modal.active {
+            display: flex;
+        }
         .save-location-form {
-            background: rgba(30,41,59,0.98);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 2rem;
             width: 90%;
             max-width: 400px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
-
-        /* --- Dark mode --- */
-        .dark-mode { background: linear-gradient(135deg, #0f172a, #1e293b); color: #e5e7eb; }
-
-        /* --- Ride type tabs --- */
-        #ride-type-tabs button {
-            font-size: 0.75rem;
-            padding: 0.4rem 0.6rem;
+        .fare-card {
+            opacity: 0;
+            transform: translateY(20px);
         }
-        @media (min-width: 480px) {
-            #ride-type-tabs button { font-size: 0.875rem; padding: 0.5rem 1rem; }
+        .map-container {
+            opacity: 0;
+            transform: scale(0.95);
         }
-
-        /* --- Update route button --- */
-        #updateRouteBtn { font-size: 0.875rem; }
-
-        /* --- Distance/time boxes --- */
-        .stat-box p:first-child { font-size: 0.75rem; }
-        .stat-box p:last-child { font-size: 1.5rem; }
-        @media (min-width: 640px) {
-            .stat-box p:first-child { font-size: 0.875rem; }
-            .stat-box p:last-child { font-size: 1.875rem; }
+        .animate-in {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        /* --- Loading spinner --- */
-        .loading-spinner { opacity: 0; transform: scale(0.8); }
+        .loading-spinner {
+            opacity: 0;
+            transform: scale(0.8);
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
-    <nav class="bg-white/95 shadow-md sticky top-0 z-50 w-full backdrop-blur-lg">
-        <div class="flex justify-between items-center px-4 py-3 max-w-7xl mx-auto">
-            <h1 class="text-xl md:text-2xl font-bold text-black flex items-center">
-                <span class="text-yellow-500 mr-2">⚡</span>QuickFare
-            </h1>
-            <div class="nav-links-desktop flex space-x-6 text-black text-sm md:text-base">
-                <a href="./index.html#home" class="nav-link hover:text-yellow-500 font-medium">Home</a>
-                <a href="./index.html#about" class="nav-link hover:text-yellow-500 font-medium">About</a>
-                <a href="./index.html#contact" class="nav-link hover:text-yellow-500 font-medium">Contact</a>
-                <a href="./index.html#faq" class="nav-link hover:text-yellow-500 font-medium">FAQ</a>
-            </div>
-            <div class="flex items-center space-x-3 md:space-x-4">
-                <button id="darkModeToggle" class="text-black hover:text-yellow-500 transition-colors">🌙</button>
-                <img src="https://bl-i.thgim.com/public/incoming/ln7mm7/article67393201.ece/alternates/LANDSCAPE_1200/ola%20logo.jpg" alt="Ola" class="service-logo-nav h-6 md:h-8 rounded">
-                <img src="https://tuskstrategies.com/wp-content/uploads/2022/07/uber-logo_4.png" alt="Uber" class="service-logo-nav h-6 md:h-8 rounded">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMzAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMzAiPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMzAiIHJ4PSI0IiBmaWxsPSIjZmNlODNhIi8+PHRleHQgeD0iNTAiIHk9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiPlJhcGlkbzwvdGV4dD48L3N2Zz4=" alt="Rapido" class="service-logo-nav h-6 md:h-8">
+    <nav class="bg-white/95 shadow-md p-4 flex justify-between items-center sticky top-0 z-50 w-full backdrop-blur-lg">
+        <h1 class="text-2xl font-bold text-black flex items-center">
+            <span class="text-yellow-500 mr-2">⚡</span>QuickFare
+        </h1>
+        <div class="flex space-x-8 text-black">
+            <a href="./index.html#home" class="nav-link hover:text-yellow-500 font-medium">Home</a>
+            <a href="./index.html#about" class="nav-link hover:text-yellow-500 font-medium">About</a>
+            <a href="./index.html#contact" class="nav-link hover:text-yellow-500 font-medium">Contact</a>
+            <a href="./index.html#faq" class="nav-link hover:text-yellow-500 font-medium">FAQ</a>
+        </div>
+        <div class="flex items-center space-x-6">
+            <button id="darkModeToggle" class="text-black hover:text-yellow-500 transition-colors duration-300">🌙</button>
+            <div class="flex space-x-4">
+                <img src="https://bl-i.thgim.com/public/incoming/ln7mm7/article67393201.ece/alternates/LANDSCAPE_1200/ola%20logo.jpg" alt="Ola" class="h-8 service-logo">
+                <img src="https://tuskstrategies.com/wp-content/uploads/2022/07/uber-logo_4.png" alt="Uber" class="h-8 service-logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMzAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMzAiPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMzAiIHJ4PSI0IiBmaWxsPSIjZmNlODNhIi8+PHRleHQgeD0iNTAiIHk9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiPlJhcGlkbzwvdGV4dD48L3N2Zz4=" alt="Rapido" class="h-8 service-logo">
             </div>
         </div>
     </nav>
@@ -344,86 +329,87 @@
         </div>
     </div>
 
-    <section class="flex-grow px-3 py-4 md:px-6 md:py-12 section">
-        <div class="text-center max-w-4xl mx-auto w-full">
-            <h2 class="text-2xl md:text-4xl font-extrabold text-white mb-4 md:mb-6">🚖 Your Fare Comparison</h2>
+    <section class="flex-grow flex items-center justify-center px-6 py-12 section">
+        <div class="text-center max-w-4xl w-full">
+            <h2 class="text-4xl font-extrabold text-white mb-6 animate__animated animate__fadeIn">🚖 Your Fare Comparison</h2>
             <div class="glass-card">
                 <!-- Map -->
-                <div id="map" class="mb-4 md:mb-8"></div>
+                <div id="map" class="mb-8"></div>
                 
-                <!-- Location Details (Editable) -->
-                <div class="highlight-box">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+                <!-- Location Details (Editable Flow) -->
+                <div class="highlight-box mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
                         <div class="text-left relative">
-                            <label for="pickupInput" class="block text-xs md:text-sm font-semibold text-yellow-400 mb-1 md:mb-2">📍 Pickup Location</label>
+                            <label for="pickupInput" class="block text-sm font-semibold text-yellow-400 mb-2">📍 Pickup Location</label>
                             <div class="relative group">
                                 <input type="text" id="pickupInput" placeholder="Enter Pickup Location"
-                                    class="w-full p-3 md:p-4 pr-10 md:pr-12 rounded-xl input-field bg-gray-800/80 text-white border border-gray-600 focus:border-yellow-400 focus:outline-none transition-all duration-300 text-sm md:text-base">
+                                    class="w-full p-4 pr-12 rounded-xl input-field bg-gray-800/80 backdrop-blur text-white border border-gray-600 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 focus:outline-none shadow-inner transition-all duration-300">
                                 <button type="button" onclick="fetchCurrentLocation()" title="Use Current Location"
-                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-400 hover:text-yellow-400 transition-colors">
-                                    <i class="fas fa-location-crosshairs text-base"></i>
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-yellow-400 transition-colors">
+                                    <i class="fas fa-location-crosshairs text-lg"></i>
                                 </button>
                             </div>
-                            <div id="pickup-results" class="location-results hidden z-50"></div>
+                            <div id="pickup-results" class="location-results hidden absolute z-50 w-full mt-1 bg-white text-black rounded-lg shadow-xl max-h-48 overflow-y-auto"></div>
                         </div>
                         
-                        <!-- Desktop Swap Button (centered between columns) -->
-                        <div class="absolute inset-0 items-center justify-center pointer-events-none md:flex hidden">
+                        <!-- Swap Button -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none md:flex hidden">
                             <button type="button" onclick="swapAndRefetch()" title="Swap Locations"
-                                class="h-9 w-9 flex items-center justify-center bg-gray-800 border-2 border-gray-600 hover:border-yellow-400 hover:bg-gray-700 rounded-full transition-all hover:rotate-180 duration-300 pointer-events-auto z-10 shadow-xl">
-                                <i class="fas fa-exchange-alt text-yellow-400 text-xs"></i>
+                                class="h-10 w-10 flex items-center justify-center bg-gray-800 border-2 border-gray-600 hover:border-yellow-400 hover:bg-gray-700 rounded-full transition-all hover:rotate-180 duration-300 pointer-events-auto z-10 shadow-xl">
+                                <i class="fas fa-exchange-alt text-yellow-400 text-sm"></i>
                             </button>
                         </div>
                         
                         <!-- Mobile Swap Button -->
-                        <div class="flex justify-center -my-1 relative z-10 md:hidden">
+                        <div class="flex justify-center -my-3 relative z-10 md:hidden">
                             <button type="button" onclick="swapAndRefetch()" title="Swap Locations"
-                                class="h-9 w-9 flex items-center justify-center bg-gray-800 border-2 border-gray-600 hover:border-yellow-400 rounded-full transition-all shadow-xl">
-                                <i class="fas fa-exchange-alt text-yellow-400 rotate-90 text-xs"></i>
+                                class="h-10 w-10 flex items-center justify-center bg-gray-800 border-2 border-gray-600 hover:border-yellow-400 hover:bg-gray-700 rounded-full transition-all hover:rotate-180 duration-300 shadow-xl">
+                                <i class="fas fa-exchange-alt text-yellow-400 rotate-90 text-sm"></i>
                             </button>
                         </div>
 
                         <div class="text-left relative">
-                            <label for="dropInput" class="block text-xs md:text-sm font-semibold text-yellow-400 mb-1 md:mb-2">📍 Drop Location</label>
+                            <label for="dropInput" class="block text-sm font-semibold text-yellow-400 mb-2">📍 Drop Location</label>
                             <input type="text" id="dropInput" placeholder="Enter Drop Location"
-                                class="w-full p-3 md:p-4 rounded-xl input-field bg-gray-800/80 text-white border border-gray-600 focus:border-yellow-400 focus:outline-none transition-all duration-300 text-sm md:text-base">
-                            <div id="drop-results" class="location-results hidden z-50"></div>
+                                class="w-full p-4 rounded-xl input-field bg-gray-800/80 backdrop-blur text-white border border-gray-600 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 focus:outline-none shadow-inner transition-all duration-300">
+                            <div id="drop-results" class="location-results hidden absolute z-50 w-full mt-1 bg-white text-black rounded-lg shadow-xl max-h-48 overflow-y-auto"></div>
                         </div>
                     </div>
                     
                     <button onclick="applyNewLocations()" id="updateRouteBtn" 
-                        class="mt-4 w-full bg-gradient-to-r from-gray-700 to-gray-800 text-white py-3 rounded-xl hover:from-yellow-400 hover:to-yellow-500 hover:text-gray-900 transition-all font-bold shadow-lg duration-200 hidden relative group overflow-hidden text-sm md:text-base">
-                        <span class="relative z-10">Apply New Route <i class="fas fa-arrow-right ml-2"></i></span>
+                        class="mt-6 w-full bg-gradient-to-r from-gray-700 to-gray-800 text-white py-4 rounded-xl hover:from-yellow-400 hover:to-yellow-500 hover:text-gray-900 transition-all font-bold transform hover:-translate-y-1 shadow-lg hover:shadow-yellow-500/30 duration-200 hidden relative group overflow-hidden">
+                        <span class="relative z-10">Apply New Route <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></span>
+                        <div class="absolute inset-0 h-full w-full bg-white/20 scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-300 ease-out z-0"></div>
                     </button>
                 </div>
 
                 <!-- Distance and Time -->
-                <div class="highlight-box grid grid-cols-2 gap-4 text-center">
-                    <div class="stat-box">
-                        <p class="font-semibold text-gray-300">📏 Distance</p>
-                        <p id="distance" class="font-bold text-white mt-1">Fetching...</p>
+                <div class="highlight-box mb-8 grid grid-cols-2 gap-6 text-center">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-300">📏 Distance</p>
+                        <p id="distance" class="text-3xl font-bold text-white mt-2">Fetching...</p>
                     </div>
-                    <div class="stat-box">
-                        <p class="font-semibold text-gray-300">⏳ Time</p>
-                        <p id="time" class="font-bold text-white mt-1">Fetching...</p>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-300">⏳ Time</p>
+                        <p id="time" class="text-3xl font-bold text-white mt-2">Fetching...</p>
                     </div>
                 </div>
 
                 <!-- Ride Type Filter -->
-                <div id="ride-type-tabs" class="mb-4 flex justify-center space-x-2 bg-gray-800 p-1.5 rounded-xl max-w-xs mx-auto shadow-inner">
-                    <button onclick="updateRideType('bike')" id="btn-bike" class="flex-1 py-2 px-2 rounded-lg font-medium transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🏍️ Bike</button>
-                    <button onclick="updateRideType('auto')" id="btn-auto" class="flex-1 py-2 px-2 rounded-lg font-medium transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🛺 Auto</button>
-                    <button onclick="updateRideType('car')"  id="btn-car"  class="flex-1 py-2 px-2 rounded-lg font-medium transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🚗 Car</button>
+                <div class="mb-6 flex justify-center space-x-2 bg-gray-800 p-2 rounded-lg max-w-sm mx-auto shadow-inner">
+                    <button onclick="updateRideType('bike')" id="btn-bike" class="flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🏍️ Bike</button>
+                    <button onclick="updateRideType('auto')" id="btn-auto" class="flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🛺 Auto</button>
+                    <button onclick="updateRideType('car')" id="btn-car"  class="flex-1 py-2 px-2 md:px-4 rounded-md font-medium text-xs md:text-sm transition-colors duration-200 text-gray-300 hover:text-white hover:bg-gray-700">🚗 Car</button>
                 </div>
 
                 <!-- Fare Options -->
-                <div id="fares" class="space-y-3"></div>
+                <div id="fares" class="space-y-4"></div>
 
-                <p class="text-xs text-gray-400 mt-4">*Fares may vary due to surge pricing or traffic conditions.</p>
+                <p class="text-xs text-gray-300 mt-6">*Fares may vary due to surge pricing or traffic conditions.</p>
 
                 <button onclick="window.location.href = './index.html#home'" 
-                    class="mt-6 bg-gray-800 border border-gray-700 text-white font-bold px-6 py-3 rounded-xl hover:bg-gray-700 hover:border-gray-500 transition-all duration-300 shadow-lg flex items-center justify-center mx-auto group text-sm md:text-base">
-                    <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i> Back to Search
+                    class="mt-8 bg-gray-800 border border-gray-700 text-white font-bold px-8 py-4 rounded-xl hover:bg-gray-700 hover:border-gray-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg flex items-center justify-center mx-auto group">
+                    <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i> Back to Search
                 </button>
             </div>
         </div>
@@ -856,46 +842,36 @@
                         
                         const faresDiv = document.getElementById("fares");
                         faresDiv.innerHTML = data.prices.map(fare => {
-                            // --- Build correct deep links for each provider ---
-                            const pLat = pickupCoords ? pickupCoords.lat : '';
-                            const pLng = pickupCoords ? pickupCoords.lng : '';
-                            const dLat = dropCoords ? dropCoords.lat : '';
-                            const dLng = dropCoords ? dropCoords.lng : '';
-                            const pEnc = encodeURIComponent(pickup);
-                            const dEnc = encodeURIComponent(drop);
-
-                            let appLink = '';
-                            let storeLink = '';
-
-                            if (fare.service === 'Ola') {
-                                // Ola: web URL with coordinates for deeplink
-                                appLink = `https://book.olacabs.com/?pickup_lat=${pLat}&pickup_lng=${pLng}&drop_lat=${dLat}&drop_lng=${dLng}&category=${fare.vehicleType}`;
-                                storeLink = 'https://play.google.com/store/apps/details?id=com.olacabs.customer';
-                            } else if (fare.service === 'Uber') {
-                                // Uber: official universal deeplink with coords
-                                appLink = `uber://?action=setPickup&pickup[latitude]=${pLat}&pickup[longitude]=${pLng}&pickup[nickname]=${pEnc}&dropoff[latitude]=${dLat}&dropoff[longitude]=${dLng}&dropoff[nickname]=${dEnc}`;
-                                storeLink = 'https://play.google.com/store/apps/details?id=com.ubercab';
-                            } else if (fare.service === 'Rapido') {
-                                // Rapido: standard deeplink with encoded address fallback
-                                appLink = `https://rapido.bike/quick-book?pickup_lat=${pLat}&pickup_lng=${pLng}&drop_lat=${dLat}&drop_lng=${dLng}`;
-                                storeLink = 'https://play.google.com/store/apps/details?id=com.rapido.passenger';
+                            let link = "";
+                            let fallbackUrl = "";
+                            
+                            if (fare.service === "Ola") {
+                                link = `ola://ride?pickup=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(drop)}&category=${fare.vehicle_type}`;
+                                fallbackUrl = "https://play.google.com/store/apps/details?id=com.olacabs.customer";
+                            } else if (fare.service === "Uber") {
+                                link = `uber://?action=setPickup&pickup[latitude]=${pickupCoords?.lat || ''}&pickup[longitude]=${pickupCoords?.lng || ''}&dropoff[latitude]=${dropCoords?.lat || ''}&dropoff[longitude]=${dropCoords?.lng || ''}&product_id=${fare.vehicle_type}`;
+                                fallbackUrl = "https://play.google.com/store/apps/details?id=com.ubercab";
+                            } else if (fare.service === "Rapido") {
+                                link = `rapido://ride?pickup=${encodeURIComponent(pickup)}&drop=${encodeURIComponent(drop)}`;
+                                fallbackUrl = "https://play.google.com/store/apps/details?id=com.rapido.passenger";
                             }
 
                             return `
-                            <div class="fare-option">
-                                <span class="fare-name">${fare.displayName}</span>
-                                <div class="fare-right">
+                            <div class="fare-option p-4 rounded-lg flex justify-between items-center">
+                                <span class="text-lg font-medium">${fare.display_name}</span>
+                                <div class="text-right flex items-center space-x-4">
                                     <div>
-                                        <div class="fare-price">₹${fare.fare}</div>
-                                        <div class="fare-eta">${fare.eta}</div>
+                                        <strong class="text-xl text-yellow-400">₹${fare.fare}</strong>
+                                        <p class="text-sm text-gray-300">${fare.eta}</p>
                                     </div>
-                                    <button onclick="openRideLink('${appLink}', '${storeLink}')" class="book-btn">
+                                    <button onclick="openRideLink('${link}', '${fallbackUrl}')" 
+                                        class="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-500 transition font-bold transform hover:scale-105 duration-200">
                                         Book Now
                                     </button>
                                 </div>
                             </div>
                             `;
-                        }).join('');
+                        }).join("");
                     } else {
                         document.getElementById("fares").innerHTML = '<p class="text-red-400 p-4">Could not load fares.</p>';
                         document.getElementById("distance").innerText = "Error";
@@ -945,21 +921,17 @@
             await fetchAndDisplayFares(encodeURIComponent(pickup), encodeURIComponent(drop), encodeURIComponent(rideType));
         }
 
-        function openRideLink(appLink, storeLink) {
-            // For Uber (app:// scheme), try the app and fallback to Play Store
-            if (appLink.startsWith('uber://')) {
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = appLink;
-                document.body.appendChild(iframe);
-                setTimeout(() => { document.body.removeChild(iframe); }, 1500);
-                setTimeout(() => {
-                    if (!document.hidden) window.open(storeLink, '_blank');
-                }, 2000);
-            } else {
-                // For Ola/Rapido: open web URL directly (works both in browser and redirects to app)
-                window.open(appLink, '_blank');
-            }
+        function openRideLink(link, fallbackUrl) {
+            // Try to open the app directly
+            window.location.href = link;
+            
+            // Set timeout to check if app opened
+            setTimeout(() => {
+                // If we're still on the page after 2 seconds, the app didn't open
+                if (document.hidden === false) {
+                    window.location.href = fallbackUrl;
+                }
+            }, 2000);
         }
 
         // Intersection Observer for Section Animations
