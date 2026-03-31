@@ -21,6 +21,15 @@ public class RouteController {
         this.routeService = routeService;
     }
 
+    @org.springframework.beans.factory.annotation.Value("${quickfare.api.google-maps.key}")
+    private String googleMapsKey;
+
+    @GetMapping(value = "/config.js", produces = "application/javascript")
+    public String getConfigJs() {
+        return "const GOMAPS_API_KEY = '" + googleMapsKey + "';\n" +
+               "document.write('<script src=\"https://maps.googleapis.com/maps/api/js?key=' + GOMAPS_API_KEY + '&libraries=places,directions\"><\\/script>');";
+    }
+
     /**
      * GET /api/route?pickup=...&drop=...&rideType=...
      * Calculate route and fare from pickup to drop address.
@@ -29,11 +38,14 @@ public class RouteController {
     public ResponseEntity<RouteResponse> calculateRoute(
             @RequestParam String pickup,
             @RequestParam String drop,
-            @RequestParam String rideType) {
+            @RequestParam String rideType,
+            @RequestParam(required = false) Double distanceKm,
+            @RequestParam(required = false) Double durationMin) {
 
-        log.info("Route request: pickup='{}', drop='{}', rideType='{}'", pickup, drop, rideType);
+        log.info("Route request: pickup='{}', drop='{}', rideType='{}', distance={}, duration={}", 
+                pickup, drop, rideType, distanceKm, durationMin);
 
-        RouteResponse response = routeService.calculateRoute(pickup, drop, rideType);
+        RouteResponse response = routeService.calculateRoute(pickup, drop, rideType, distanceKm, durationMin);
         return ResponseEntity.ok(response);
     }
 }

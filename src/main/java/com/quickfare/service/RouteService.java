@@ -37,7 +37,7 @@ public class RouteService {
      * @param rideType Vehicle category (bike, auto, car)
      * @return Route response with distance, time, and all service fares
      */
-    public RouteResponse calculateRoute(String pickup, String drop, String rideType) {
+    public RouteResponse calculateRoute(String pickup, String drop, String rideType, Double providedDistanceKm, Double providedDurationMin) {
         if (pickup == null || pickup.isBlank()) {
             throw new InvalidInputException("Pickup location is required");
         }
@@ -50,24 +50,35 @@ public class RouteService {
 
         log.info("Calculating route: pickup='{}', drop='{}', rideType='{}'", pickup, drop, rideType);
 
-        // Geocode addresses to coordinates
-        GeocodingService.Coordinates pickupCoords = geocodingService.geocodeAddress(pickup);
-        GeocodingService.Coordinates dropCoords = geocodingService.geocodeAddress(drop);
+        double distanceKm;
+        double durationMin;
+        double trafficMultiplier = 1.0;
 
-        // Get traffic-aware distance and time
-        TrafficService.TrafficData trafficData = trafficService.getTrafficConditions(
-                pickupCoords.lat(), pickupCoords.lng(),
-                dropCoords.lat(), dropCoords.lng()
-        );
+        if (providedDistanceKm != null && providedDurationMin != null && providedDistanceKm > 0) {
+            distanceKm = providedDistanceKm;
+            durationMin = providedDurationMin;
+            log.info("Using client-provided measurements: {} km, {} min", distanceKm, durationMin);
+        } else {
+            // Geocode addresses to coordinates
+            GeocodingService.Coordinates pickupCoords = geocodingService.geocodeAddress(pickup);
+            GeocodingService.Coordinates dropCoords = geocodingService.geocodeAddress(drop);
 
-        double distanceKm = trafficData.distanceKm();
-        double durationMin = trafficData.durationMin();
+            // Get traffic-aware distance and time
+            TrafficService.TrafficData trafficData = trafficService.getTrafficConditions(
+                    pickupCoords.lat(), pickupCoords.lng(),
+                    dropCoords.lat(), dropCoords.lng()
+            );
+
+            distanceKm = trafficData.distanceKm();
+            durationMin = trafficData.durationMin();
+            trafficMultiplier = trafficData.trafficMultiplier();
+        }
 
         // Build fare comparison list based on ride type
         List<FarePriceDto> prices = buildFareComparison(rideType, distanceKm, durationMin);
 
         // Get traffic condition and time of day
-        String trafficCondition = trafficService.getTrafficConditionLabel(trafficData.trafficMultiplier());
+        String trafficCondition = trafficService.getTrafficConditionLabel(trafficMultiplier);
         String timeOfDay = fareCalculationService.getTimeOfDay();
 
         return RouteResponse.builder()
