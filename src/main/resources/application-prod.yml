@@ -2,15 +2,7 @@
 # QuickFare — Production Profile (PostgreSQL on Render)
 # ============================================================
 
-spring:
-  datasource:
-    url: ${DATABASE_URL}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 
 logging:
   level:
